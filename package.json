@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/pformb/tinyapp/issues"
   },
-  "homepage": "https://github.com/pformb/tinyapp#readme"
+  "homepage": "https://github.com/pformb/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
