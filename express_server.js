@@ -2,8 +2,21 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+generateRandomString = () => {
+  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let randomString = '';
+
+  for (let i = 0; i < 6; i++) {
+    randomString += characters[Math.floor(Math.random() * characters.length)];
+  }
+  return randomString;
+}
+
+
 // tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs");
+
+app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
@@ -21,6 +34,14 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+});
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send(generateRandomString()); // Respond with random 6 alphanumeric string
+});
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 app.get("/urls/:id", (req, res) => {
