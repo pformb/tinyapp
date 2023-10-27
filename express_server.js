@@ -23,19 +23,32 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id; // Get the :id parameter from the URL
+  const longURL = urlDatabase[id]; // Retrieve the long URL from the urlDatabase using the id
+
+  if (longURL) {
+    const templateVars = { id, longURL };
+    res.render("urls_show", templateVars);
+  } else {
+    // Handle the case where the :id parameter doesn't exist in the database
+    res.status(404).send("URL not found");
+  }
+});
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
- 
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// app.get("/set", (req, res) => {
+//   const a = 1;
+//   res.send(`a = ${a}`);
+//  });
+
+//  app.get("/fetch", (req, res) => {
+//   res.send(`a = ${a}`);
+//  });
