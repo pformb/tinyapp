@@ -3,15 +3,15 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 generateRandomString = () => {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let randomString = '';
+  const characters =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let randomString = "";
 
   for (let i = 0; i < 6; i++) {
     randomString += characters[Math.floor(Math.random() * characters.length)];
   }
   return randomString;
-}
-
+};
 
 // tells the Express app to use EJS as its templating engine
 app.set("view engine", "ejs");
@@ -36,8 +36,10 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send(generateRandomString()); // Respond with random 6 alphanumeric string
+  const longURL = req.body.longURL; // Get the longURL from the request body
+  const shortURL = generateRandomString(); // Generate a random short URL
+  urlDatabase[shortURL] = longURL; // Save the key-value pair to the urlDatabase
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -51,6 +53,18 @@ app.get("/urls/:id", (req, res) => {
   if (longURL) {
     const templateVars = { id, longURL };
     res.render("urls_show", templateVars);
+  } else {
+    // Handle the case where the :id parameter doesn't exist in the database
+    res.status(404).send("URL not found");
+  }
+});
+
+app.get("/u/:id", (req, res) => {
+  const id = req.params.id; // Get the :id parameter from the URL
+  const longURL = urlDatabase[id]; // Retrieve the long URL from the urlDatabase using the id
+
+  if (longURL) {
+    res.redirect(longURL);
   } else {
     // Handle the case where the :id parameter doesn't exist in the database
     res.status(404).send("URL not found");
