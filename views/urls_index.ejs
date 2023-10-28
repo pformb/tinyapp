@@ -24,6 +24,7 @@
           <tr>
             <th scope="col">Short URL ID</th>
             <th scope="col">Long URL</th>
+            <th scope="col">Delete</th> <!-- Add a column for the form -->
           </tr>
         </thead>
         <tbody>
@@ -31,6 +32,16 @@
             <tr>
               <td><%= id %></td>
               <td><%= urls[id] %></td>
+              <td>
+                <!-- Use Bootstrap grid to place the delete button inline -->
+                <div class="row">
+                  <div class="col">
+                    <form method="POST" action="/urls/<%= id %>/delete">
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                  </div>
+                </div>
+              </td>
             </tr>
           <% } %>
         </tbody>
