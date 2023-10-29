@@ -35,20 +35,52 @@ app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
+
 app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL; // Get the longURL from the request body
-  const shortURL = generateRandomString(); // Generate a random short URL
-  urlDatabase[shortURL] = longURL; // Save the key-value pair to the urlDatabase
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id; // Get the :id parameter from the URL
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
   if (urlDatabase[id]) {
-    delete urlDatabase[id]; // Remove the URL from the urlDatabase
+    urlDatabase[id] = req.body.longURL; // Update the longURL in the database with the new value from req.body
     res.redirect("/urls"); // Redirect the client back to the urls_index page ("/urls")
   } else {
-    // Handle the case where the :id parameter doesn't exist in the database
+    res.status(404).send("URL not found");
+  }
+});
+
+// New POST route to handle URL updates
+app.get("/urls/:id/edit", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  if (longURL) {
+    const templateVars = { id, longURL };
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(404).send("URL not found");
+  }
+});
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  if (longURL) {
+    const templateVars = { id, longURL };
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(404).send("URL not found");
+  }
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  if (urlDatabase[id]) {
+    delete urlDatabase[id];
+    res.redirect("/urls");
+  } else {
     res.status(404).send("URL not found");
   }
 });
@@ -57,27 +89,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:id", (req, res) => {
-  const id = req.params.id; // Get the :id parameter from the URL
-  const longURL = urlDatabase[id]; // Retrieve the long URL from the urlDatabase using the id
-
-  if (longURL) {
-    const templateVars = { id, longURL };
-    res.render("urls_show", templateVars);
-  } else {
-    // Handle the case where the :id parameter doesn't exist in the database
-    res.status(404).send("URL not found");
-  }
-});
-
 app.get("/u/:id", (req, res) => {
-  const id = req.params.id; // Get the :id parameter from the URL
-  const longURL = urlDatabase[id]; // Retrieve the long URL from the urlDatabase using the id
-
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
   if (longURL) {
     res.redirect(longURL);
   } else {
-    // Handle the case where the :id parameter doesn't exist in the database
     res.status(404).send("URL not found");
   }
 });
@@ -89,6 +106,7 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
 
 // app.get("/set", (req, res) => {
 //   const a = 1;
