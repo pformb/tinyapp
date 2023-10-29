@@ -18,5 +18,22 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+    <div class="ml-auto"> <!-- This class aligns content to the right -->
+      <form method="POST" action="/login">
+        <div class="form-row align-items-center">
+          <div class="col-auto">
+            <input
+              class="form-control"
+              type="text"
+              name="username"
+              placeholder="Username"
+            />
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </nav>
 </header>

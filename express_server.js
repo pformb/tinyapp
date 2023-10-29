@@ -64,6 +64,19 @@ app.get("/urls/:id/edit", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
+// New POST route to handle logins
+app.post('/login', (req, res) => {
+  const { username } = req.body;
+  if (username) {
+    // Set a cookie named "username" with the value from the form submission.
+    res.cookie('username', username);
+    res.redirect('/urls');
+  } else {
+    res.send('Username not provided');
+  }
+});
+
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
@@ -106,7 +119,6 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
 
 // app.get("/set", (req, res) => {
 //   const a = 1;
