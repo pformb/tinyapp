@@ -56,6 +56,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", { username: req.cookies["username"] });
 });
 
+// Define a route handler for rendering a page to create a new URL
+app.get("/register", (req, res) => {
+  res.render("register", { username: req.cookies["username"] });
+});
+
+
 // Define a route handler for updating an existing URL in the database
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
