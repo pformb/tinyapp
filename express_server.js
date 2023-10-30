@@ -91,6 +91,16 @@ app.post('/login', (req, res) => {
   }
 });
 
+// Define a route handler for handling user logout and clearing a username cookie
+app.post('/logout', (req, res) => {
+  const { username } = req.body;
+  if (username) {
+    // Clear the "username" cookie
+    res.clearCookie('username');
+    res.redirect('/urls');
+  }
+});
+
 // Define a route handler for rendering a page to show details of a specific URL
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
