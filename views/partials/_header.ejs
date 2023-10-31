@@ -22,11 +22,11 @@
     </div>
     <div class="ml-auto">
       <div class="col-auto">
-        <% if (username) { %>
+        <% if (user) { %>
           <div class="d-flex">
-            <span class="text-light mr-2">Logged in as: <%= username %></span>
+            <span class="text-light mr-2">Logged in as: <%= user.email %></span>
             <form method="POST" action="/logout">
-              <input type="hidden" name="username" value="<%= username %>">
+              <input type="hidden" name="user_id" value="<%= user.id %>">
               <button type="submit" class="btn btn-primary">Logout</button>
             </form>
           </div>
