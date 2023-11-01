@@ -12,6 +12,19 @@ generateRandomString = () => { // Define a function to generate a random string,
   return randomString;
 };
 
+// Define a user lookup helper function
+function findUserByEmail(email) {
+  // Loop through the users to find the user with the given email
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      return user; // Return the user object if found
+    }
+  }
+
+  return null; // Return null if user not found
+}
+
 app.set("view engine", "ejs"); // Set EJS as the template engine for rendering views
 app.use(express.urlencoded({ extended: true }));// Parse URL-encoded request bodies
 app.use(cookieParser()); // Use the cookie-parser middleware
@@ -69,8 +82,8 @@ app.post("/register", (req, res) => { // Define a route handler for user registr
   const { email, password } = req.body;
   // Check if the email is already in use
   for (const userId in users) {
-    if (users[userId].email === email) {
-      return res.status(400).send("Email is already registered.");
+    if (users[userId].email === email || !email || !password) {
+      return res.status(400).send(`Error 400 - email is already registered or not enough info provided`);
     }
   }
   // Generate a unique user ID (you can use your own logic)
