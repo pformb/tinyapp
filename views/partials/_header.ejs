@@ -18,6 +18,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <a class="nav-item nav-link" href="/register">Sign Up</a>
+        <a class="nav-item nav-link" href="/login">Log In</a>
       </div>
     </div>
     <div class="ml-auto">
@@ -30,24 +31,7 @@
               <button type="submit" class="btn btn-primary">Logout</button>
             </form>
           </div>
-        <% } else { %>  
-          <form method="POST" action="/login">
-            <div class="form-row align-items-center">
-              <div class="col-auto">
-                <input
-                  class="form-control"
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                />
-              </div>
-              <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Login</button>
-              </div>
-            </div>
-          </form>
-        <% } %>
-             
+        <% }  %>  
       </div>
     </div>
   </nav>

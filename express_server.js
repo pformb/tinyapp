@@ -11,18 +11,13 @@ generateRandomString = () => { // Define a function to generate a random string,
   }
   return randomString;
 };
-
-// Define a user lookup helper function
 function findUserByEmail(email) {
-  // Loop through the users to find the user with the given email
   for (const userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      return user; // Return the user object if found
+    if (users[userId].email === email) {
+      return users[userId];
     }
   }
-
-  return null; // Return null if user not found
+  return null; // Return null if the email is not found in the users object
 }
 
 app.set("view engine", "ejs"); // Set EJS as the template engine for rendering views
@@ -121,14 +116,20 @@ app.get("/urls/:id/edit", (req, res) => { // Define a route handler for renderin
   }
 });
 
-app.post("/login", (req, res) => { // Define a route handler for handling user logins and setting a user_id cookie
-  const { user_id } = req.body;
-  if (user_id) {
-    // Set a cookie named "user_id" with the value from the form submission.
-    res.cookie('user_id', user_id);
+app.get("/login", (req, res) => { // Define a route handler for rendering a page to log in
+  res.render("login", { user: users[req.cookies.user_id] });
+});
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  const user = findUserByEmail(email);
+
+  if (user && user.password === password) {
+    // Successful login
+    res.cookie('user_id', user.id);
     res.redirect('/urls');
   } else {
-    res.send('User ID not provided');
+    res.send('User not found or incorrect password');
   }
 });
 
@@ -137,7 +138,7 @@ app.post('/logout', (req, res) => { // Define a route handler for handling user 
   if (user_id) {
     // Clear the "user_id" cookie
     res.clearCookie('user_id');
-    res.redirect('/urls');
+    res.redirect('/login');
   }
 });
 
