@@ -66,22 +66,38 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// Define a route handler for creating a new URL, generates a short URL, and redirects to the URL details page
 app.post("/urls/", (req, res) => {
-  // Define a route handler for creating a new URL, generates a short URL, and redirects to the URL details page
+  if (req.cookies.user_id) {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${shortURL}`); 
+  } else {
+    res.send("<h2>Must be logged in</h2>")
+  }
 });
 
 // Define a route handler for rendering a page to create a new URL
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", { user: users[req.cookies.user_id] });
+  const templateVars = {
+    urls: urlDatabase,
+    user: users[req.cookies.user_id],
+  };
+  if (req.cookies.user_id) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login")
+  }
 });
 
 // Define a route handler for rendering a page to create a new URL
 app.get("/register", (req, res) => {
-  res.render("register", { user: users[req.cookies.user_id] });
+  if (req.cookies.user_id) {
+    res.redirect("/urls")
+  } else {
+    res.render("register", { user: users[req.cookies.user_id] });
+  }
 });
 
 // Define a route handler for user registration
@@ -134,14 +150,17 @@ app.get("/urls/:id/edit", (req, res) => {
 
 // Define a route handler for rendering a page to log in
 app.get("/login", (req, res) => {
+  if (req.cookies.user_id) {
+    res.redirect("/urls")
+  } else {
   res.render("login", { user: users[req.cookies.user_id] });
+  }
 });
 
 // Define a route handler for handling user login and adding the user_id cookie
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUserByEmail(email);
-
   if (user && user.password === password) {
     // Successful login
     res.cookie("user_id", user.id);
@@ -184,11 +203,6 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-// Define a route handler for rendering a page to create a new URL
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
-
 // Define a route handler to redirect to the long URL when given a short URL
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
@@ -196,7 +210,7 @@ app.get("/u/:id", (req, res) => {
   if (longURL) {
     res.redirect(longURL);
   } else {
-    res.status(404).send("URL not found");
+    res.send("<h2>Not a valid short URL</h2>");
   }
 });
 
