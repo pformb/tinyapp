@@ -32,7 +32,7 @@ npm install
 node express_server.js
 ```
 
-3. Open your web browser and navigate to http://localhost:8080/urls
+3. Open your web browser and navigate to http://localhost:8080/register
 
 
 ## Usage
@@ -45,17 +45,13 @@ node express_server.js
 
 ##### - Click on a shortened URL to be redirected to the original URL.
 
-## Technologies Used
+## Dependencies
 
-##### - Node.js
-
-##### - Express.js
-
-##### - EJS (Embedded JavaScript) for templating
-
-##### - Bootstrap for styling
-
-##### - Cookie-parser for handling user authentication
+- Node.js
+- Express
+- EJS
+- bcryptjs
+- cookie-session
 
 ## Contributing
 

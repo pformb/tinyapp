@@ -3,7 +3,7 @@ const cookieSession = require("cookie-session"); // Import the cookie-session mi
 const bcrypt = require("bcryptjs"); // Import the bcryptjs node package
 const app = express(); // Create an instance of the Express application
 const PORT = 8080; // Set the default port for the server to listen on
-const { getUserByEmail } = require('./helpers'); 
+const { getUserByEmail } = require("./helpers");
 
 // Define a function to generate a random string, used to create short URLs
 const generateRandomString = () => {
@@ -16,6 +16,7 @@ const generateRandomString = () => {
   return randomString;
 };
 
+// Define a function that retrieves URLs associated with a specific user from a database
 const urlsForUser = (id) => {
   const userURLs = {};
   for (const urlID in urlDatabase) {
@@ -24,18 +25,20 @@ const urlsForUser = (id) => {
     }
   }
   return userURLs;
-}
+};
 
 app.set("view engine", "ejs"); // Set EJS as the template engine for rendering views
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 // Use the cookie-session middleware
-app.use(cookieSession({
-  name: 'session',
-  keys: ['XyZz8yWp4vP8nTm1rVvS3qCwKmZz7pDy'],
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["XyZz8yWp4vP8nTm1rVvS3qCwKmZz7pDy"],
 
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
 
 // Initialize a sample URL database with short URL mappings to long URLs
 const urlDatabase = {
@@ -50,7 +53,6 @@ const urlDatabase = {
 };
 // Initialize a sample user data object
 const users = {
- 
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
@@ -71,11 +73,6 @@ app.get("/", (req, res) => {
 // Define a route handler for "/urls.json" that sends the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-// Define a route handler for "/urls.json" that sends the user database in JSON format
-app.get("/users.json", (req, res) => {
-  res.json(users);
 });
 
 // Define a route handler for "/urls" that renders the "urls_index" template with data, including the username from the user's cookie
@@ -153,7 +150,7 @@ app.post("/register", (req, res) => {
     email,
     password: hashedPassword,
   };
-  // Set a user_id cookie containing the user's newly generated ID
+  // Set a user_id session containing the user's newly generated ID
   req.session.user_id = userId;
   res.redirect("/urls");
 });
@@ -221,7 +218,7 @@ app.post("/logout", (req, res) => {
     req.session.user_id = null;
     res.redirect("/login");
   } else {
-    res.redirect("/login"); 
+    res.redirect("/login");
   }
 });
 
