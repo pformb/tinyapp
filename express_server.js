@@ -1,5 +1,6 @@
 const express = require("express"); // Import the Express framework
 const cookieParser = require("cookie-parser"); // Import the cookie-parser middleware
+const bcrypt = require("bcryptjs"); // Import the bcryptjs node package
 const app = express(); // Create an instance of the Express application
 const PORT = 8080; // Set the default port for the server to listen on
 
@@ -50,15 +51,16 @@ const urlDatabase = {
 };
 // Initialize a sample user data object
 const users = {
+ 
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: bcrypt.hashSync("userPassword", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("user2Password", 10),
   },
 };
 
@@ -70,6 +72,11 @@ app.get("/", (req, res) => {
 // Define a route handler for "/urls.json" that sends the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+// Define a route handler for "/urls.json" that sends the user database in JSON format
+app.get("/users.json", (req, res) => {
+  res.json(users);
 });
 
 // Define a route handler for "/urls" that renders the "urls_index" template with data, including the username from the user's cookie
@@ -116,7 +123,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-// Define a route handler for rendering a page to create a new URL
+// Define a route handler for rendering a page for user registration
 app.get("/register", (req, res) => {
   if (req.cookies.user_id) {
     res.redirect("/urls");
@@ -138,12 +145,14 @@ app.post("/register", (req, res) => {
         );
     }
   }
+  // Use bcrypt to hash the password
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const userId = generateRandomString();
   // Add the user to the global `users` object
   users[userId] = {
     id: userId,
     email,
-    password,
+    password: hashedPassword,
   };
   // Set a user_id cookie containing the user's newly generated ID
   res.cookie("user_id", userId);
@@ -195,8 +204,9 @@ app.get("/login", (req, res) => {
 // Define a route handler for handling user login and adding the user_id cookie
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const user = findUserByEmail(email);
-  if (user && user.password === password) {
+  if (user && bcrypt.compareSync(password, hashedPassword)) {
     // Successful login
     res.cookie("user_id", user.id);
     res.redirect("/urls");
@@ -258,9 +268,8 @@ app.post("/urls/:id/delete", (req, res) => {
 // Define a route handler to redirect to the long URL when given a short URL
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id].longURL;
-  if (longURL) {
-    res.redirect(longURL);
+  if (urlDatabase[id] && urlDatabase[id].longURL) {
+    res.redirect(urlDatabase[id].longURL);
   } else {
     res.send("<h2>Not a valid short URL</h2>");
   }
