@@ -63,5 +63,15 @@ This project is open source and available.
 ## Acknowledgements
 This project has brought me knowledge and skills and I want to thank Lighthouse Labs for providing the mentorship through my education.
 
+## Final Product
+
+!["Screenshot of URLs page"](https://github.com/pformb/tinyapp/blob/master/docs/urls-page.png?raw=true)
+
+!["Screenshot of Login page"](https://github.com/pformb/tinyapp/blob/master/docs/login-page.png?raw=true)
+
+
+!["Screenshot of Registration page"](https://github.com/pformb/tinyapp/blob/master/docs/registration-page.png?raw=true)
+
+!["Screenshot of Create URL page"](https://github.com/pformb/tinyapp/blob/master/docs/new-url-page.png?raw=true)
 
 ### Happy URL Shortening!
