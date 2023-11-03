@@ -3,6 +3,7 @@ const cookieSession = require("cookie-session"); // Import the cookie-session mi
 const bcrypt = require("bcryptjs"); // Import the bcryptjs node package
 const app = express(); // Create an instance of the Express application
 const PORT = 8080; // Set the default port for the server to listen on
+const { getUserByEmail } = require('./helpers'); 
 
 // Define a function to generate a random string, used to create short URLs
 const generateRandomString = () => {
@@ -14,15 +15,6 @@ const generateRandomString = () => {
   }
   return randomString;
 };
-// Define a function to search for users by email
-function findUserByEmail(email) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return users[userId];
-    }
-  }
-  return null;
-}
 
 const urlsForUser = (id) => {
   const userURLs = {};
@@ -212,7 +204,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const user = findUserByEmail(email);
+  const user = getUserByEmail(email, users);
   if (user && bcrypt.compareSync(password, hashedPassword)) {
     // Successful login
     req.session.user_id = user.id;
