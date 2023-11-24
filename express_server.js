@@ -3,29 +3,7 @@ const cookieSession = require("cookie-session"); // Import the cookie-session mi
 const bcrypt = require("bcryptjs"); // Import the bcryptjs node package
 const app = express(); // Create an instance of the Express application
 const PORT = 8080; // Set the default port for the server to listen on
-const { getUserByEmail } = require("./helpers");
-
-// Define a function to generate a random string, used to create short URLs
-const generateRandomString = () => {
-  const characters =
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let randomString = "";
-  for (let i = 0; i < 6; i++) {
-    randomString += characters[Math.floor(Math.random() * characters.length)];
-  }
-  return randomString;
-};
-
-// Define a function that retrieves URLs associated with a specific user from a database
-const urlsForUser = (id) => {
-  const userURLs = {};
-  for (const urlID in urlDatabase) {
-    if (urlDatabase[urlID].userID === id) {
-      userURLs[urlID] = urlDatabase[urlID];
-    }
-  }
-  return userURLs;
-};
+const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
 
 app.set("view engine", "ejs"); // Set EJS as the template engine for rendering views
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
@@ -40,17 +18,9 @@ app.use(
   })
 );
 
-// Initialize a sample URL database with short URL mappings to long URLs
-const urlDatabase = {
-  b2xVn2: {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "aJ48lW",
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    userID: "aJ48lW",
-  },
-};
+// Initialize an empty URL database
+const urlDatabase = {};
+
 // Initialize a sample user data object
 const users = {
   userRandomID: {
@@ -65,11 +35,14 @@ const users = {
   },
 };
 
-// Define a route handler for the root URL ("/") that sends a "Hello!" response
+// Define a route handler for the root URL ("/") 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
-
 // Define a route handler for "/urls.json" that sends the URL database in JSON format
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -87,24 +60,41 @@ app.get("/urls", (req, res) => {
     };
     res.render("urls_index", templateVars);
   } else {
-    res.send("<h2>Must be logged in</h2>");
+    // Display an error message
+    res.status(401).send("<h2>Error: Must be logged in</h2>");
+    // Redirect to the login page
+    res.redirect("/login");
   }
 });
 
+
 // Define a route handler for creating a new URL, generates a short URL, and redirects to the URL details page
-app.post("/urls/", (req, res) => {
+app.post("/urls", (req, res) => {
   if (req.session.user_id) {
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
-    urlDatabase[shortURL] = {
-      longURL: longURL, // Access longURL property
-      userID: req.session.user_id,
-    };
-    res.redirect(`/urls/${shortURL}`);
+
+    // Use the urlsForUser function to get the user's URLs
+    const userURLs = urlsForUser(req.session.user_id);
+
+    // Check if the short URL is already owned by the user
+    if (!userURLs.includes(shortURL)) {
+      // Display an error message
+      res.status(403).send("<h2>Error: You do not have permission to create this URL</h2>");
+    } else {
+      // Create the new URL
+      urlDatabase[shortURL] = {
+        longURL: longURL,
+        userID: req.session.user_id,
+      };
+      res.redirect(`/urls/${shortURL}`);
+    }
   } else {
-    res.send("<h2>Must be logged in</h2>");
+    // Display an error message if the user is not logged in
+    res.status(401).send("<h2>Error: Must be logged in</h2>");
   }
 });
+
 
 // Define a route handler for rendering a page to create a new URL
 app.get("/urls/new", (req, res) => {
