@@ -20,7 +20,7 @@ const generateRandomString = () => {
 };
 
 // Define a function that retrieves URLs associated with a specific user from a database
-const urlsForUser = (id) => {
+const urlsForUser = (id, urlDatabase) => {
   const userURLs = {};
   for (const urlID in urlDatabase) {
     if (urlDatabase[urlID].userID === id) {

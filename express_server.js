@@ -52,7 +52,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   if (req.session.user_id) {
     const user_id = req.session.user_id;
-    const userURLs = urlsForUser(user_id); // Use the function to get the user's URLs
+    const userURLs = urlsForUser(user_id, urlDatabase); // Use the function to get the user's URLs
 
     const templateVars = {
       urls: userURLs, // Use the filtered userURLs object
@@ -75,10 +75,10 @@ app.post("/urls", (req, res) => {
     const shortURL = generateRandomString();
 
     // Use the urlsForUser function to get the user's URLs
-    const userURLs = urlsForUser(req.session.user_id);
+    const userURLs = urlsForUser(req.session.user_id, urlDatabase);
 
     // Check if the short URL is already owned by the user
-    if (!userURLs.includes(shortURL)) {
+    if (userURLs.hasOwnProperty(shortURL)) {
       // Display an error message
       res.status(403).send("<h2>Error: You do not have permission to create this URL</h2>");
     } else {
@@ -190,14 +190,14 @@ app.get("/login", (req, res) => {
 // Define a route handler for handling user login and adding the user_id cookie
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
   const user = getUserByEmail(email, users);
-  if (user && bcrypt.compareSync(password, hashedPassword)) {
+
+  if (user && bcrypt.compareSync(password, user.password)) {
     // Successful login
     req.session.user_id = user.id;
     res.redirect("/urls");
   } else {
-    res.status(403).send("E-mail cannot be found");
+    res.status(403).send("E-mail and password do not match");
   }
 });
 

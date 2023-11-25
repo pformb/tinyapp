@@ -17,8 +17,12 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Sign Up</a>
-        <a class="nav-item nav-link" href="/login">Log In</a>
+        <% if (!user) { %>
+          <a class="nav-item nav-link" href="/register">Sign Up</a>
+          <a class="nav-item nav-link" href="/login">Log In</a>
+        <% } else { %>
+          
+        <% } %>
       </div>
     </div>
     <div class="ml-auto">
@@ -31,7 +35,7 @@
               <button type="submit" class="btn btn-primary">Logout</button>
             </form>
           </div>
-        <% }  %>  
+        <% } %>  
       </div>
     </div>
   </nav>
